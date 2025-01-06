@@ -2,7 +2,7 @@
   "name": "pwa-manifest-webpack-plugin",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsup",
     "test": "jest"
@@ -23,6 +23,10 @@
   "files": [
     "dist"
   ],
+  "peerDependencies": {
+    "html-webpack-plugin": "^5.0.0",
+    "webpack": "^5.20"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
