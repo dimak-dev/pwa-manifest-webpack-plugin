@@ -1,5 +1,8 @@
 import type {WebpackPluginInstance, Compiler} from 'webpack';
 import {IPWAManifestWebpackPluginConfig} from "./types/IPWAManifestWebpackPluginConfig";
+import {jsonStringify} from "./utils/jsonStringify";
+import {bufferFrom} from "./utils/bufferFrom";
+import {getAssetMetadata} from "./utils/getAssetMetadata";
 
 export class PWAManifestWebpackPlugin implements WebpackPluginInstance {
     static PLUGIN_NAME = 'PWAManifestWebpackPlugin';
@@ -10,13 +13,14 @@ export class PWAManifestWebpackPlugin implements WebpackPluginInstance {
     }
 
     apply(compiler: Compiler): void {
-        const {webpack: {sources: {RawSource}}} = compiler;
-
         compiler.hooks.thisCompilation.tap(PWAManifestWebpackPlugin.PLUGIN_NAME, (compilation) => {
-            const manifestBuffer = Buffer.from(JSON.stringify(this.options.manifest), 'utf-8');
+            const content = jsonStringify(this.options.manifest);
+            const manifestBuffer = bufferFrom(content);
 
             compilation.hooks.processAssets.tap(PWAManifestWebpackPlugin.PLUGIN_NAME, () => {
-                compilation.emitAsset(this.options.outputFile, new RawSource(manifestBuffer));
+                const {path, source, info} = getAssetMetadata(compilation, manifestBuffer, this.options.outputFile);
+
+                compilation.emitAsset(path, source, info);
             });
         });
     }
